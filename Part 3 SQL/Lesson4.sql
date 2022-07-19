@@ -112,3 +112,43 @@ JOIN region AS r
 ON s.region_id = r.id
 GROUP BY r.name
 ORDER BY number_of_sales_reps
+
+-- Concept 17 - Group By Part 2
+
+-- 1 
+SELECT a.name, AVG(o.standard_qty) standard, AVG(o.gloss_qty) gloss, AVG(o.poster_qty) poster
+FROM accounts AS a 
+JOIN orders AS o 
+ON o.account_id = a.id 
+GROUP BY a.name
+ORDER BY a.name
+
+-- 2 
+SELECT a.name, AVG(o.standard_amt_usd) standard_usd, AVG(o.gloss_amt_usd) gloss_usd, AVG(o.poster_amt_usd) poster_usd
+FROM accounts AS a 
+JOIN orders AS o 
+ON o.account_id = a.id 
+GROUP BY a.name
+ORDER BY a.name
+
+-- 3
+SELECT s.name, w.channel, COUNT(*) no_of_time
+FROM web_events AS w
+JOIN accounts AS a
+ON w.account_id = a.id
+JOIN sales_reps AS s
+ON a.sales_rep_id = s.id
+GROUP BY s.name, w.channel
+ORDER BY no_of_time DESC
+
+-- 4 
+SELECT r.name, w.channel, COUNT(*) num_events
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY r.name, w.channel
+ORDER BY num_events DESC;
