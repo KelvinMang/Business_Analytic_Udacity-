@@ -182,3 +182,97 @@ ORDER BY num_accounts;
 --
 SELECT DISTINCT id, name
 FROM sales_reps;
+
+-- Concept 23 - HAVING
+
+-- 1 
+SELECT COUNT(*) no_of_sales_reps
+FROM(SELECT s.name, COUNT(*) accounts
+FROM sales_reps AS s
+JOIN accounts AS a
+ON a.sales_rep_id = s.id 
+GROUP BY s.name
+HAVING COUNT(*) > 5
+ORDER BY accounts) AS Table_1
+
+-- 2 
+SELECT a.id, a.name, COUNT(*) num_orders
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING COUNT(*) > 20
+ORDER BY num_orders;
+
+-- 3
+SELECT a.id, a.name, COUNT(*) num_orders
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY num_orders DESC
+LIMIT 1;
+
+-- 4
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) > 30000
+ORDER BY total_spent;
+
+-- 5
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) < 1000
+ORDER BY total_spent;
+
+-- 6
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY total_spent DESC
+LIMIT 1
+
+-- 7
+SELECT a.id, a.name, SUM(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id, a.name
+ORDER BY total_spent 
+LIMIT 1
+
+-- 8
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+HAVING COUNT(*) > 6 AND w.channel = 'facebook'
+ORDER BY use_of_channel;
+
+-- 9 
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+WHERE w.channel = 'facebook'
+ORDER BY use_of_channel DESC
+LIMIT 1;
+
+-- 10 
+SELECT a.id, a.name, w.channel, COUNT(*) use_of_channel
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+ORDER BY use_of_channel DESC
+LIMIT 10;
