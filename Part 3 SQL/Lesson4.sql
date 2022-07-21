@@ -276,3 +276,105 @@ ON a.id = w.account_id
 GROUP BY a.id, a.name, w.channel
 ORDER BY use_of_channel DESC
 LIMIT 10;
+
+-- Concept 27 - Date Function
+
+-- 1 
+SELECT DATE_PART('year', occurred_at) ord_year,  SUM(total_amt_usd) total_spent
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- 2 
+SELECT DATE_PART('month', occurred_at) ord_month, SUM(total_amt_usd) total_spent
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2 DESC; 
+
+-- 3 
+SELECT DATE_PART('year', occurred_at) ord_year,  COUNT(*) total_sales
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- 4 
+SELECT DATE_PART('month', occurred_at) ord_month, COUNT(*) total_order
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2 DESC
+
+-- 5 
+SELECT DATE_TRUNC('month', o.occurred_at) ord_date, SUM(o.gloss_amt_usd) tot_spent
+FROM orders o 
+JOIN accounts a
+ON a.id = o.account_id
+WHERE a.name = 'Walmart'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+--  Concept 31 CASE
+
+-- 1 
+SELECT account_id, total_amt_usd,
+CASE WHEN total_amt_usd > 3000 THEN 'Large'
+ELSE 'Small' END AS order_level
+FROM orders;
+
+-- 2 
+SELECT CASE WHEN total >= 2000 THEN 'At Least 2000'
+WHEN total >= 1000 AND total < 2000 THEN 'Between 1000 and 2000'
+ELSE 'Less than 1000' END AS order_category,
+COUNT(*) AS order_count
+FROM orders
+GROUP BY 1;
+
+-- 3 
+SELECT a.name, SUM(total_amt_usd) total_spent, 
+CASE WHEN SUM(total_amt_usd) > 200000 THEN 'top'
+WHEN  SUM(total_amt_usd) > 100000 THEN 'middle'
+ELSE 'low' END AS customer_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id 
+GROUP BY a.name
+ORDER BY 2 DESC;
+
+-- 4 
+SELECT a.name, SUM(total_amt_usd) total_spent, 
+CASE WHEN SUM(total_amt_usd) > 200000 THEN 'top'
+WHEN  SUM(total_amt_usd) > 100000 THEN 'middle'
+ELSE 'low' END AS customer_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+WHERE occurred_at > '2015-12-31' 
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- 5
+SELECT s.name, COUNT(*) num_ords,
+  CASE WHEN COUNT(*) > 200 THEN 'top'
+  ELSE 'not' END AS sales_rep_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id 
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.name
+ORDER BY 2 DESC;
+
+-- 6
+SELECT s.name, COUNT(*) num_ords, SUM(o.total_amt_usd) total_sales,
+  CASE  WHEN COUNT(*) > 200 OR SUM(o.total_amt_usd) > 750000 THEN 'top'
+        WHEN COUNT(*) > 150 OR SUM(o.total_amt_usd) > 50000 THEN 'middle'
+  ELSE 'not' END AS sales_rep_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id 
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.name
+ORDER BY 2 DESC;
